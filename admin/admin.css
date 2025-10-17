@@ -1,0 +1,397 @@
+/* --- Root Variables: Colors & Fonts --- */
+:root {
+    --indigo-dark: #4B0082;    /* Deep Navy for headers, primary buttons */
+    --indigo-light: #9500ff;   /* Lighter blue for stats, secondary actions */
+    --white: #FFFFFF;
+    --off-white: #f8f9fa;      /* Page background */
+    --text-dark: #2c3e50;      /* Main text color */
+    --text-light: #84817a;     /* Lighter text for details */
+    --border-color: #dee2e6;   /* Subtle border for tables, cards */
+    --danger-red: #e74c3c;     /* For delete actions and cancelled status */
+    --success-green: #2ecc71;  /* For view actions and completed status */
+    --warning-orange: #f39c12; /* For edit actions and pending status */
+    --info-blue: #8a34db;      /* For preparing status */
+    --font-serif: 'Georgia', 'Times New Roman', serif;
+    --font-sans: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* --- General Styling --- */
+body {
+    font-family: var(--font-sans);
+    margin: 0;
+    background-color: var(--off-white);
+    color: var(--text-dark);
+}
+
+/* --- Reusable Button Styles --- */
+.btn {
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 0.7rem 1.8rem;
+    font-size: 0.9rem;
+    color: var(--white);
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+.btn-primary { background-color: var(--indigo-dark); }
+.btn-primary:hover { background-color: #000; }
+
+.btn-add-new {
+    background-color: var(--success-green);
+    color: var(--white);
+    padding: 0.7rem 1.8rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-add-new:hover {
+    background-color: #27ae60; /* A slightly darker green */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-edit, .btn-delete, .btn-view {
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border-radius: 20px;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-edit:hover, .btn-delete:hover, .btn-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-edit { 
+    background-color: var(--warning-orange); 
+}
+.btn-edit:hover {
+    background-color: #f1c40f;
+}
+
+.btn-view { 
+    background-color: var(--success-green); 
+}
+.btn-view:hover {
+    background-color: #27ae60;
+}
+
+.btn-delete { 
+    background-color: var(--danger-red); 
+    margin-left: 0.5rem;
+}
+.btn-delete:hover {
+    background-color: #c0392b;
+}
+
+
+/* --- Header Styling --- */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--white);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.logo-container img {
+    height: 40px;
+}
+
+.logo-container h1 {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    color: var(--indigo-dark);
+    margin: 0;
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: bold;
+    margin-left: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    color: var(--indigo-dark);
+}
+
+/* --- Main Content --- */
+.content-wrapper {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h2 {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: var(--indigo-dark);
+    margin: 0;
+}
+
+/* --- Dashboard Card Styling --- */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+#revenue-card {
+    grid-column: 1 / -1; /* Make this card span the full width */
+}
+
+.card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+    margin-top: 0;
+    color: var(--text-dark);
+    font-size: 1.2rem;
+}
+
+.card .stat {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0 0;
+    color: var(--indigo-light);
+}
+
+/* --- Table Styling --- */
+.table-container {
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden; /* Ensures the child table respects the border-radius */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead tr {
+    background-color: var(--indigo-dark);
+    color: var(--white);
+}
+
+th, td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background-color: var(--off-white);
+}
+
+tbody td {
+    color: var(--text-light);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.product-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* --- Status Label Styling --- */
+.status {
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--white);
+    text-transform: uppercase;
+}
+.status.completed { background-color: var(--success-green); }
+.status.pending   { background-color: var(--warning-orange); }
+.status.preparing { background-color: var(--info-blue); }
+.status.cancelled { background-color: var(--danger-red); }
+
+/* --- Modal Styling --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(75, 0, 130, 0.5); /* Indigo overlay */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--white);
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close-button {
+    color: var(--text-light);
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover {
+    color: var(--text-dark);
+}
+
+.modal-content h2 {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    color: var(--indigo-dark);
+    margin: 0 0 1.5rem;
+}
+
+.modal-content form label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+.modal-content form input {
+    width: 100%;
+    padding: 0.8rem;
+    margin-top: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-content form input:focus {
+    outline: none;
+    border-color: var(--indigo-light);
+    box-shadow: 0 0 0 3px rgba(75, 0, 130, 0.5);
+}
+
+/* Modal for viewing order details */
+#modal-body ul {
+    list-style-type: none;
+    padding: 0;
+    color: var(--text-light);
+}
+
+#modal-body hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 1rem 0;
+}
+
+.modal-actions {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* --- Pagination Styling --- */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.pagination-controls button {
+    background-color: var(--indigo-dark);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+    background-color: var(--indigo-light);
+}
+
+.pagination-controls button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#page-info {
+    font-weight: bold;
+    color: var(--text-dark);
+}
+

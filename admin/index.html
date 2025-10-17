@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Dashboard - ScentSational</title>
+        <link rel="stylesheet" href="admin.css">
+    </head>
+    <body>
+        <header class="main-header">
+            <div class="logo-container">
+                <img src="../frontend/src/assets/images/scentsational-logo.png" alt="Logo">
+            </div>
+            <nav class="main-nav">
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/products">Product Management</a>
+                <a href="/admin/orders">Orders</a>
+                <a href="/admin/categories">Categories</a>
+            </nav>
+        </header>
+
+        <main class="content-wrapper">
+            <div class="page-header">
+                <h2>Overview</h2>
+            </div>
+            <div class="card-container">
+                <div class="card" id="revenue-card">
+                    <h3>Today's Revenue</h3>
+                    <p class="stat" id="revenue-stat">₱0</p>
+                </div>
+                <div class="card">
+                    <h3>New Orders</h3>
+                    <p class="stat" id="new-orders-stat">0</p>
+                </div>
+                <div class="card">
+                    <h3>Total Products</h3>
+                    <p class="stat" id="total-items-stat">0</p>
+                </div>
+                <div class="card">
+                    <h3>Orders in Progress</h3>
+                    <p class="stat" id="preparing-orders-stat">0</p>
+                </div>
+                <div class="card">
+                    <h3>Completed Orders (Today)</h3>
+                    <p class="stat" id="completed-orders-stat">0</p>
+                </div>
+            </div>
+
+            <div class="page-header" style="margin-top: 3rem;">
+                <h2>Top Selling Products</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PRODUCT NAME</th>
+                            <th>UNITS SOLD</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-products-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const newOrdersStat = document.getElementById('new-orders-stat');
+                const revenueStat = document.getElementById('revenue-stat');
+                const totalItemsStat = document.getElementById('total-items-stat');
+                const preparingOrdersStat = document.getElementById('preparing-orders-stat');
+                const completedOrdersStat = document.getElementById('completed-orders-stat');
+                const topProductsTableBody = document.getElementById('top-products-table-body');
+
+
+                // Fetches and calculates order-related stats
+                const fetchOrderStats = async () => {
+                    try {
+                        const response = await fetch('/api/orders');
+                        const orders = await response.json();
+
+                        const today = new Date().toISOString().split('T')[0];
+
+                        // Calculate new orders (status is "Pending")
+                        const newOrders = orders.filter(order => order.status === 'Pending').length;
+                        newOrdersStat.textContent = newOrders;
+
+                        // Calculate today's revenue
+                        const todaysRevenue = orders
+                            .filter(order => order.createdAt.startsWith(today) && order.status === 'Completed')
+                            .reduce((sum, order) => sum + order.totalPrice, 0);
+                        revenueStat.textContent = `₱${todaysRevenue.toFixed(2)}`;
+
+                        const preparingOrders = orders.filter(order => order.status === 'Preparing').length;
+                        preparingOrdersStat.textContent = preparingOrders;
+
+                        const completedToday = orders.filter(order => order.createdAt.startsWith(today) && order.status === 'Completed').length;
+                        completedOrdersStat.textContent = completedToday;
+
+                    } catch (error) {
+                        console.error('Error fetching order stats:', error);
+                        newOrdersStat.textContent = 'N/A';
+                        revenueStat.textContent = 'N/A';
+                        preparingOrdersStat.textContent = 'N/A';
+                        completedOrdersStat.textContent = 'N/A';
+                    }
+                };
+
+                // Fetches total product count
+                const fetchProductStats = async () => {
+                    try {
+                        const response = await fetch('/api/products');
+                        const products = await response.json();
+                        totalItemsStat.textContent = products.length;
+                    } catch (error) {
+                        console.error('Error fetching product stats:', error);
+                        totalItemsStat.textContent = 'N/A';
+                    }
+                };
+                
+                // Fetches and displays top selling products
+                const fetchTopSellingProducts = async () => {
+                    try {
+                        const ordersResponse = await fetch('/api/orders');
+                        const orders = await ordersResponse.json();
+
+                        const productSales = {};
+
+                        orders.forEach(order => {
+                            if (order.status === 'Completed') {
+                                order.items.forEach(item => {
+                                    if(item.productId) {
+                                        if (productSales[item.productId._id]) {
+                                            productSales[item.productId._id].unitsSold += item.quantity;
+                                        } else {
+                                            productSales[item.productId._id] = {
+                                                name: item.productId.name,
+                                                unitsSold: item.quantity,
+                                            };
+                                        }
+                                    }
+                                });
+                            }
+                        });
+
+                        const sortedProducts = Object.values(productSales).sort((a, b) => b.unitsSold - a.unitsSold).slice(0, 5); // Top 5
+
+                        topProductsTableBody.innerHTML = '';
+                        sortedProducts.forEach(product => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${product.name}</td>
+                                <td>${product.unitsSold}</td>
+                            `;
+                            topProductsTableBody.appendChild(row);
+                        });
+
+                    } catch (error) {
+                        console.error('Error fetching top selling products:', error);
+                    }
+                };
+                
+                // Load all stats when the page loads
+                fetchOrderStats();
+                fetchProductStats();
+                fetchTopSellingProducts();
+            });
+        </script>
+    </body>
+</html>

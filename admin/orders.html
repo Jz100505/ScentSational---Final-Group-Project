@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management - Centro Admin</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="../frontend/src/assets/images/scentsational-logo.png" alt="Logo">
+        </div>
+            <nav class="main-nav">
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/products">Product Management</a>
+                <a href="/admin/orders">Orders</a>
+                <a href="/admin/categories">Categories</a>
+            </nav>
+    </header>
+
+    <main class="content-wrapper">
+        <div class="page-header">
+            <h2>Orders</h2>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ORDER ID</th>
+                        <th>CUSTOMER</th>
+                        <th>TOTAL</th>
+                        <th>STATUS</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table-body">
+                </tbody>
+            </table>
+        </div>
+                    <div class="pagination-controls">
+                <button id="prev-page-btn">&laquo; Previous</button>
+                <span id="page-info"></span>
+                <button id="next-page-btn">Next &raquo;</button>
+            </div>
+    </main>
+
+    <div id="order-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modal-title">Order Details</h2>
+            <div id="modal-body"></div>
+            <div class="modal-actions">
+                <label for="status-update">Update Status:</label>
+                <select id="status-update">
+                    <option value="Pending">Pending</option>
+                    <option value="Preparing">Preparing</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                <button id="update-status-btn" class="btn-submit">Update</button>
+                <button id="delete-order-btn" class="btn-delete">Delete Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('orders-table-body');
+            const modal = document.getElementById('order-details-modal');
+            const closeBtn = modal.querySelector('.close-button');
+            const modalBody = document.getElementById('modal-body');
+            const statusSelect = document.getElementById('status-update');
+            const updateBtn = document.getElementById('update-status-btn');
+            const deleteBtn = document.getElementById('delete-order-btn');
+            const prevPageBtn = document.getElementById('prev-page-btn');
+            const nextPageBtn = document.getElementById('next-page-btn');
+            const pageInfo = document.getElementById('page-info');
+            let currentOrderId = null;
+
+            let allOrders = [];
+            let currentPage = 1;
+            const itemsPerPage = 5; // You can adjust this number
+
+            const apiBase = '/api/orders';
+
+            const displayOrders = () => {
+                tableBody.innerHTML = '';
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const paginatedOrders = allOrders.slice(startIndex, endIndex);
+
+                paginatedOrders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order._id.slice(-6)}</td>
+                        <td>${order.customerName}</td>
+                        <td>₱${order.totalPrice}</td>
+                        <td><span class="status ${order.status.toLowerCase()}">${order.status}</span></td>
+                        <td>
+                            <button class="btn-view" data-id="${order._id}">VIEW</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                updatePagination();
+            };
+
+            const updatePagination = () => {
+                const totalPages = Math.ceil(allOrders.length / itemsPerPage);
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+                prevPageBtn.disabled = currentPage === 1;
+                nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+            };
+
+            const fetchOrders = async () => {
+                const response = await fetch(apiBase);
+                allOrders = await response.json();
+                currentPage = 1; 
+                displayOrders();
+            };
+
+            const openModal = (order) => {
+                currentOrderId = order._id;
+                modalBody.innerHTML = `
+                    <p><strong>Order ID:</strong> ${order._id}</p>
+                    <p><strong>Customer:</strong> ${order.customerName}</p>
+                    <p><strong>Total:</strong> ₱${order.totalPrice}</p>
+                    <p><strong>Status:</strong> ${order.status}</p>
+                    <hr>
+                    <h4>Items:</h4>
+                    <ul>
+                        ${order.items.map(item => `<li>${item.quantity}x ${item.productId.name}</li>`).join('')}
+                    </ul>
+                `;
+                statusSelect.value = order.status;
+                modal.style.display = 'flex';
+            };
+
+            const closeModal = () => {
+                modal.style.display = 'none';
+            };
+
+            closeBtn.onclick = closeModal;
+            window.onclick = (e) => {
+                if (e.target == modal) closeModal();
+            };
+            
+            updateBtn.addEventListener('click', async () => {
+                if (!currentOrderId) return;
+                
+                await fetch(`${apiBase}/${currentOrderId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: statusSelect.value }),
+                });
+
+                closeModal();
+                fetchOrders();
+            });
+
+            deleteBtn.addEventListener('click', async () => {
+                if (!currentOrderId) return;
+
+                if (confirm('Are you sure you want to permanently delete this order?')) {
+                    await fetch(`${apiBase}/${currentOrderId}`, { method: 'DELETE' });
+                    closeModal();
+                    fetchOrders();
+                }
+            });
+
+            tableBody.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('btn-view')) {
+                    const orderId = e.target.dataset.id;
+                    const selectedOrder = allOrders.find(o => o._id === orderId);
+                    if (selectedOrder) {
+                        openModal(selectedOrder);
+                    }
+                }
+            });
+
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayOrders();
+                }
+            });
+
+            nextPageBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(allOrders.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayOrders();
+                }
+            });
+
+            fetchOrders();
+        });
+    </script>
+</body>
+</html>
