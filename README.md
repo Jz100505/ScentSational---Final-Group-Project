@@ -42,11 +42,10 @@ npm run serve
 ### 🌐 Access the Application
 - **User Website:** [http://localhost:8080](http://localhost:8080)  
 - **Admin Panel:** [http://localhost:3000/admin](http://localhost:3000/admin)  
-  **Login:** `admin`  
-  **Password:** `password123`
 
 ---
 
 ✅ **Tips**
 - Make sure both the frontend and backend are running at the same time.  
 - If you encounter a port conflict, stop other running services or change the port number in the config.
+
