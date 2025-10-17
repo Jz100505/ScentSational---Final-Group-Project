@@ -1,3 +1,13 @@
+## Section: WD-301
+
+### Group Members:
+- **Manaloto, Johnzelle**  
+- **Valencia, Chean**  
+- **Quiambao, Adan**  
+- **Ocampo, Friend**
+
+---
+
 ## ScentSational - How to Run
 
 This project is a **luxury perfume e-commerce site** built with **Vue.js (frontend)** and **Node.js/Express (backend)**.
